@@ -105,8 +105,8 @@ public class SHA1 {
                 }
 
                 // System.out.println("Word: " + words[i] + " " + Long.parseLong(words[i], 2));
-                int temp = (int) (((Integer.rotateLeft(a, 5)) + functionOutput + e + constant
-                        + (Long.parseLong(words[i], 2))));
+                int temp = (int) ((Integer.rotateLeft(a, 5)) + functionOutput + e + constant
+                        + (Long.parseLong(words[i], 2)));
                 e = d;
                 d = c;
                 c = Integer.rotateLeft(b, 30);
