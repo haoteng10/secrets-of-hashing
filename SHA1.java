@@ -9,13 +9,9 @@ public class SHA1 {
     }
 
     // Get a padded n-bit binary string
-    public static String getPaddedBinary(long val, int num) {
-        return String.format("%" + num + "s",
-                             Long.toBinaryString(val)).replace(" ", "0");
-    }
-
     public static String getPaddedBinary(int val, int num) {
-        return getPaddedBinary((long) val, num);
+        return String.format("%" + num + "s",
+                             Integer.toBinaryString(val)).replace(" ", "0");
     }
 
     // Get a padded 8-bit binary string
@@ -71,21 +67,90 @@ public class SHA1 {
 
             // Step 3: Extend the 16 32-bit words into 80 32-bit words using bitwise operators
             for (int i = 16; i < 80; i++) {
-                long bitwiseResult = (Long.parseLong(words[i - 3], 2) ^ Long.parseLong(
+                StdOut.println("Bitwise 1: " + words[i - 3]);
+                StdOut.println("Bitwise 2: " + words[i - 8]);
+                StdOut.println("Bitwise 3: " + words[i - 14]);
+                StdOut.println("Bitwise 4: " + words[i - 16]);
+
+                int bitwiseResult = (int) (Long.parseLong(words[i - 3], 2) ^ Long.parseLong(
                         words[i - 8], 2)
                         ^ Long.parseLong(words[i - 14], 2) ^ Long.parseLong(words[i - 16], 2));
-                words[i] = getPaddedBinary(Long.rotateLeft(bitwiseResult, 1), 32);
+
+
+                StdOut.println("Bitwise Result: " + Integer.toBinaryString(bitwiseResult));
+                StdOut.println("Bitwise Rotated: " + Integer.toBinaryString(
+                        Integer.rotateLeft(bitwiseResult, 1)));
+
+                words[i] = getPaddedBinary(Integer.rotateLeft(bitwiseResult, 1), 32);
+                StdOut.println("Saved word: " + words[i]);
             }
 
-            StdOut.println(Arrays.toString(words));
+            // StdOut.println(Arrays.toString(words));
 
             // Step 4: Initialize hash variables
+            int a = h0;
+            int b = h1;
+            int c = h2;
+            int d = h3;
+            int e = h4;
 
             // Step 5: Run the different functions in 4 stages (0-19, 20-39, 40-59, 60-79) and save it
+            for (int i = 0; i < 80; i++) {
+                int functionOutput;
+                int constant;
+
+                // Stage 1
+                if (i < 20) {
+                    functionOutput = (b & c) ^ ((~b) & d);
+                    constant = 0x5A827999;
+                }
+                // Stage 2
+                else if (i < 40) {
+                    functionOutput = b ^ c ^ d;
+                    constant = 0x6ED9EBA1;
+                }
+                // Stage 3
+                else if (i < 60) {
+                    functionOutput = (b & c) ^ (b & d) ^ (c & d);
+                    constant = 0x8F1BBCDC;
+                }
+                // Stage 4
+                else {
+                    functionOutput = b ^ c ^ d;
+                    constant = 0xCA62C1D6;
+                }
+
+                // System.out.println("Word: " + words[i] + " " + Long.parseLong(words[i], 2));
+                int temp = (int) ((Integer.rotateLeft(a, 5)) + functionOutput + e + constant
+                        + Long.parseLong(words[i], 2));
+                e = d;
+                d = c;
+                c = Integer.rotateLeft(b, 30);
+                b = a;
+                a = temp;
+
+            }
 
             // Step 6: Save the chunk hash for the next chunk
+
+            h0 = h0 + a;
+            h1 = h1 + b;
+            h2 = h2 + c;
+            h3 = h3 + d;
+            h4 = h4 + e;
+
         }
 
+        //
+        StdOut.println(Integer.toHexString(h0));
+        StdOut.println(Integer.toHexString(h1));
+        StdOut.println(Integer.toHexString(h2));
+        StdOut.println(Integer.toHexString(h3));
+        StdOut.println(Integer.toHexString(h4));
+
         // Step 7: Return the final hash value in hexadecimals
+        int hash = (h0 << 128) | (h1 << 96) |
+                (h2 << 64) | (h3 << 32) | h4;
+        StdOut.println("Final Result: " + Integer.toHexString(hash));
     }
 }
