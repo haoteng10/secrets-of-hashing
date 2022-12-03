@@ -8,8 +8,19 @@ public class SHA1 {
         return arr.length * 8;
     }
 
-    public static String getPaddedByte(byte val) {
-        return String.format("%8s", Integer.toBinaryString(val)).replace(" ", "0");
+    // Get a padded n-bit binary string
+    public static String getPaddedBinary(long val, int num) {
+        return String.format("%" + num + "s",
+                             Long.toBinaryString(val)).replace(" ", "0");
+    }
+
+    public static String getPaddedBinary(int val, int num) {
+        return getPaddedBinary((long) val, num);
+    }
+
+    // Get a padded 8-bit binary string
+    public static String getPaddedByte(int val) {
+        return getPaddedBinary(val, 8);
     }
 
     public static void main(String[] args) {
@@ -33,21 +44,47 @@ public class SHA1 {
         }
 
         StdOut.println(binary.toString());
+        StdOut.println("===");
 
         // Step 0: pad the message to have a length of a multiple of 512-bits
-        
+        int initialLength = binary.length();
+        String binaryInitalLength = getPaddedBinary(initialLength, 64);
+        int noPaddedZero = 512 - (initialLength % 512) - 64; // Leave 64 for length
+        for (int i = 0; i < noPaddedZero; i++) {
+            binary.append("0");
+        }
+        binary.append(binaryInitalLength);
+
+        StdOut.println(binary);
+        StdOut.println("===");
 
         // Step 1: Loop through every 512-bits as a chunk
 
-        // Step 2: Break the 512-bit chunk into 16 32-bit words
+        for (int startingPoint = 0; startingPoint < binary.length(); startingPoint += 512) {
+            String chunk = binary.substring(startingPoint, startingPoint + 512);
 
-        // Step 3: Extend the 16 32-bit words into 80 32-bit words using bitwise operators
+            String[] words = new String[80];
+            // Step 2: Break the 512-bit chunk into 16 32-bit words
+            for (int i = 0; i < 16; i++) {
+                words[i] = chunk.substring(i * 32, i * 32 + 32);
+            }
 
-        // Step 4: Initialize hash variables
+            // Step 3: Extend the 16 32-bit words into 80 32-bit words using bitwise operators
+            for (int i = 16; i < 80; i++) {
+                long bitwiseResult = (Long.parseLong(words[i - 3], 2) ^ Long.parseLong(
+                        words[i - 8], 2)
+                        ^ Long.parseLong(words[i - 14], 2) ^ Long.parseLong(words[i - 16], 2));
+                words[i] = getPaddedBinary(Long.rotateLeft(bitwiseResult, 1), 32);
+            }
 
-        // Step 5: Run the different functions in 4 stages (0-19, 20-39, 40-59, 60-79) and save it
+            StdOut.println(Arrays.toString(words));
 
-        // Step 6: Save the chunk hash for the next chunk
+            // Step 4: Initialize hash variables
+
+            // Step 5: Run the different functions in 4 stages (0-19, 20-39, 40-59, 60-79) and save it
+
+            // Step 6: Save the chunk hash for the next chunk
+        }
 
         // Step 7: Return the final hash value in hexadecimals
     }
