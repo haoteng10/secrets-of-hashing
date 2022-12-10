@@ -2,34 +2,16 @@ import java.nio.charset.StandardCharsets;
 
 public class SHA1 {
 
-    // Return the number of bits based on the length of byte arr
-    public static int getTotalBits(byte[] arr) {
-        return arr.length * 8;
-    }
+    private int h0 = 0x67452301; // Hash Variable 1
+    private int h1 = 0xEFCDAB89; // Hash Variable 2
+    private int h2 = 0x98BADCFE; // Hash Variable 3
+    private int h3 = 0x10325476; // Hash Variable 4
+    private int h4 = 0xC3D2E1F0; // Hash Variable 5
 
-    // Get a padded n-bit binary string
-    public static String getPaddedBinary(int val, int num) {
-        return String.format("%" + num + "s",
-                             Integer.toBinaryString(val)).replace(" ", "0");
-    }
+    public SHA1(String data) {
+        byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
 
-    // Get a padded 8-bit binary string
-    public static String getPaddedByte(int val) {
-        return getPaddedBinary(val, 8);
-    }
-
-    public static void main(String[] args) {
-        String input = StdIn.readLine();
-        StdOut.println("Your input is: " + input);
-
-        int h0 = 0x67452301; // 32-bit
-        int h1 = 0xEFCDAB89;
-        int h2 = 0x98BADCFE;
-        int h3 = 0x10325476;
-        int h4 = 0xC3D2E1F0;
-
-        byte[] bytes = input.getBytes(StandardCharsets.UTF_8);
-
+        // Convert ASCII number into binary
         StringBuilder binary = new StringBuilder();
         for (int i = 0; i < bytes.length; i++) {
             binary.append(getPaddedByte(bytes[i]));
@@ -46,7 +28,6 @@ public class SHA1 {
         binary.append(binaryInitalLength);
 
         // Step 1: Loop through every 512-bits as a chunk
-
         for (int startingPoint = 0; startingPoint < binary.length(); startingPoint += 512) {
 
             String chunk = binary.substring(startingPoint, startingPoint + 512);
@@ -104,7 +85,6 @@ public class SHA1 {
                     constant = 0xCA62C1D6;
                 }
 
-                // System.out.println("Word: " + words[i] + " " + Long.parseLong(words[i], 2));
                 int temp = (int) ((Integer.rotateLeft(a, 5)) + functionOutput + e + constant
                         + (Long.parseLong(words[i], 2)));
                 e = d;
@@ -123,9 +103,35 @@ public class SHA1 {
             h4 = (h4 + e);
 
         }
+    }
 
-        // Return final hash in hexadecimal
-        StdOut.printf("Hash: %s%s%s%s%s\n", Integer.toHexString(h0), Integer.toHexString(h1),
-                      Integer.toHexString(h2), Integer.toHexString(h3), Integer.toHexString(h4));
+    // Return the number of bits based on the length of byte arr
+    private static int getTotalBits(byte[] arr) {
+        return arr.length * 8;
+    }
+
+    // Get a padded n-bit binary string
+    private static String getPaddedBinary(int val, int num) {
+        return String.format("%" + num + "s",
+                             Integer.toBinaryString(val)).replace(" ", "0");
+    }
+
+    // Get a padded 8-bit binary string
+    private static String getPaddedByte(int val) {
+        return getPaddedBinary(val, 8);
+    }
+
+    // Returns the result in hexadecimal string
+    public String hexResult() {
+        return Integer.toHexString(h0) + Integer.toHexString(h1) + Integer.toHexString(h2)
+                + Integer.toHexString(h3) + Integer.toHexString(h4);
+    }
+
+    public static void main(String[] args) {
+        String input = StdIn.readLine();
+        StdOut.println("Your input is: " + input);
+
+        SHA1 testHash = new SHA1(input);
+        StdOut.printf("Hash: %s\n", testHash.hexResult());
     }
 }
