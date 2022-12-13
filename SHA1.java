@@ -1,4 +1,7 @@
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 public class SHA1 {
 
@@ -10,7 +13,26 @@ public class SHA1 {
 
     public SHA1(String data) {
         byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
+        compute(bytes);
+    }
 
+    public SHA1(File file) throws IOException {
+        byte[] bytes = Files.readAllBytes(file.toPath());
+        compute(bytes);
+    }
+
+    // Get a padded n-bit binary string
+    private static String getPaddedBinary(int val, int num) {
+        return String.format("%" + num + "s",
+                             Integer.toBinaryString(val)).replace(" ", "0");
+    }
+
+    // Get a padded 8-bit binary string
+    private static String getPaddedByte(int val) {
+        return getPaddedBinary(val, 8);
+    }
+
+    private void compute(byte[] bytes) {
         // Convert ASCII number into binary
         StringBuilder binary = new StringBuilder();
         for (int i = 0; i < bytes.length; i++) {
@@ -101,24 +123,7 @@ public class SHA1 {
             h2 = (h2 + c);
             h3 = (h3 + d);
             h4 = (h4 + e);
-
         }
-    }
-
-    // Return the number of bits based on the length of byte arr
-    private static int getTotalBits(byte[] arr) {
-        return arr.length * 8;
-    }
-
-    // Get a padded n-bit binary string
-    private static String getPaddedBinary(int val, int num) {
-        return String.format("%" + num + "s",
-                             Integer.toBinaryString(val)).replace(" ", "0");
-    }
-
-    // Get a padded 8-bit binary string
-    private static String getPaddedByte(int val) {
-        return getPaddedBinary(val, 8);
     }
 
     // Returns the result in hexadecimal string

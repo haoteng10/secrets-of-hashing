@@ -1,6 +1,7 @@
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,12 +16,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.File;
+import java.io.IOException;
 
 public class GUI implements ActionListener {
 
     private String inputText;
     private JTextArea inputArea;
     private JTextArea outputArea;
+
+    private File selectedFile;
+
+    private JLabel status;
 
     public GUI() {
 
@@ -37,6 +44,7 @@ public class GUI implements ActionListener {
         textPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 30, 20));
 
         // Input Text Area
+        // Adapted from https://docs.oracle.com/javase/tutorial/uiswing/components/textarea.html
         String placeholderMessage = "Write your message here";
         inputArea = new JTextArea(placeholderMessage);
         inputArea.setLineWrap(true);
@@ -73,27 +81,62 @@ public class GUI implements ActionListener {
         textPanel.add(inputAreaScrollPane);
         textPanel.add(outputAreaScrollPane);
 
+        // ===== Result Panel =====
+        JPanel resultPanel = new JPanel();
+
+        status = new JLabel();
+
+        resultPanel.add(status);
+
         // ===== Button Panel =====
         JPanel btnPanel = new JPanel();
 
-        // Button
-        JButton button = new JButton();
-        button.setText("Hash");
+        // Hash Button
+        JButton button = new JButton("Hash");
         button.addActionListener(this);
 
+        // Import File Button
+        JButton importButton = new JButton("File");
+        importButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fc = new JFileChooser();
+                int statusCode = fc.showOpenDialog(null);
+                if (statusCode == JFileChooser.APPROVE_OPTION) {
+                    selectedFile = fc.getSelectedFile();
+                    setStatus("Selected: " + selectedFile.getName());
+                }
+            }
+        });
+
+        // Unselect File Button
+        JButton unSelectButton = new JButton("Unselect");
+        unSelectButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                selectedFile = null;
+                setStatus("");
+            }
+        });
+
         btnPanel.add(button);
+        btnPanel.add(importButton);
+        btnPanel.add(unSelectButton);
 
         // ===== Frame =====
         JFrame frame = new JFrame();
         frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
         frame.add(headingPanel);
         frame.add(textPanel);
+        frame.add(resultPanel);
         frame.add(btnPanel);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setTitle("GUI");
         frame.pack();
         frame.setVisible(true);
 
+    }
+
+    private void setStatus(String status) {
+        this.status.setText(status);
     }
 
     public static void main(String[] args) {
@@ -103,7 +146,22 @@ public class GUI implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         inputText = inputArea.getText();
 
-        SHA1 hash = new SHA1(inputText);
-        outputArea.setText(hash.hexResult());
+        SHA1 hash;
+
+        if (selectedFile == null) {
+            hash = new SHA1(inputText);
+            outputArea.setText(hash.hexResult());
+        }
+        else {
+            try {
+                hash = new SHA1(selectedFile);
+                outputArea.setText(hash.hexResult());
+            }
+            catch (IOException ex) {
+                setStatus("Invalid file.");
+                // throw new RuntimeException(ex);
+            }
+        }
+
     }
 }
