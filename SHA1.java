@@ -5,11 +5,9 @@ import java.nio.file.Files;
 
 public class SHA1 {
 
-    private int h0 = 0x67452301; // Hash Variable 1
-    private int h1 = 0xEFCDAB89; // Hash Variable 2
-    private int h2 = 0x98BADCFE; // Hash Variable 3
-    private int h3 = 0x10325476; // Hash Variable 4
-    private int h4 = 0xC3D2E1F0; // Hash Variable 5
+    private int[] hashVars = {
+            0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0
+    };
 
     public SHA1(String data) {
         byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
@@ -75,11 +73,11 @@ public class SHA1 {
             }
 
             // Step 4: Initialize hash variables
-            int a = h0;
-            int b = h1;
-            int c = h2;
-            int d = h3;
-            int e = h4;
+            int a = hashVars[0];
+            int b = hashVars[1];
+            int c = hashVars[2];
+            int d = hashVars[3];
+            int e = hashVars[4];
 
             // Step 5: Run the different functions in 4 stages (0-19, 20-39, 40-59, 60-79) and save it
             for (int i = 0; i < 80; i++) {
@@ -118,25 +116,60 @@ public class SHA1 {
             }
 
             // Step 6: Save the chunk hash for the next chunk
-            h0 = (h0 + a);
-            h1 = (h1 + b);
-            h2 = (h2 + c);
-            h3 = (h3 + d);
-            h4 = (h4 + e);
+            hashVars[0] = hashVars[0] + a;
+            hashVars[1] = hashVars[1] + b;
+            hashVars[2] = hashVars[2] + c;
+            hashVars[3] = hashVars[3] + d;
+            hashVars[4] = hashVars[4] + e;
         }
+    }
+
+    // Convert the binaryString into padded hexadecimal
+    public String getHex(int hashNum) {
+        String hexString = Integer.toHexString(hashVars[hashNum]);
+        if (hexString.length() == 8) return hexString;
+
+        while (hexString.length() != 8) {
+            hexString = "0" + hexString;
+        }
+        return hexString;
     }
 
     // Returns the result in hexadecimal string
     public String hexResult() {
-        return Integer.toHexString(h0) + Integer.toHexString(h1) + Integer.toHexString(h2)
-                + Integer.toHexString(h3) + Integer.toHexString(h4);
+        return getHex(0) + getHex(1) + getHex(2) + getHex(3) + getHex(4);
     }
 
     public static void main(String[] args) {
-        String input = StdIn.readLine();
-        StdOut.println("Your input is: " + input);
 
-        SHA1 testHash = new SHA1(input);
-        StdOut.printf("Hash: %s\n", testHash.hexResult());
+        int total = 0;
+        int correct = 0;
+
+        // Testing
+        while (StdIn.hasNextLine()) {
+            String input = StdIn.readLine();
+            String expected = StdIn.readLine();
+            StdIn.readLine();
+
+            StdOut.println("Input: " + input);
+
+            total++;
+
+            // Hash
+            SHA1 testHash = new SHA1(input);
+            StdOut.printf("Hash: %s\n", testHash.hexResult());
+
+            // The hash computed by the program must be equal to the one in the test file
+            if (testHash.hexResult().equals(expected)) {
+                StdOut.println("Hash correct.");
+                correct++;
+            }
+            else {
+                StdOut.printf("Incorrect. \n Expect: %s \n", expected);
+            }
+        }
+
+        StdOut.printf("Correct: %d/%d \n", correct, total);
+
     }
 }
