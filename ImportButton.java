@@ -8,8 +8,8 @@ public class ImportButton implements ActionListener {
 
     private JButton button;
 
-    public ImportButton() {
-        button = new JButton("File");
+    public ImportButton(String name) {
+        button = new JButton(name);
         button.addActionListener(this);
     }
 
@@ -27,13 +27,16 @@ public class ImportButton implements ActionListener {
         }
     }
 
-    // A setter for the button
+    // A getter for the button
     // (input: none; output: the configured button)
     public JButton getButton() {
         return button;
     }
 
     public static void main(String[] args) {
+        ImportButton importButton = new ImportButton("Test");
 
+        // Making sure the hash button is set up correctly.
+        if (importButton.getButton().getText().equals("Test")) StdOut.println("Can fetch button");
     }
 }

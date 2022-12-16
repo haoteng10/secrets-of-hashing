@@ -96,11 +96,11 @@ public class GUI {
         JPanel btnPanel = new JPanel();
 
         // Hash Button
-        HashButton hashButton = new HashButton(inputArea, outputArea);
+        HashButton hashButton = new HashButton("Hash", inputArea, outputArea);
         // Import Button
-        ImportButton importButton = new ImportButton();
+        ImportButton importButton = new ImportButton("File");
         // Unselect File Button
-        ClearButton clearButton = new ClearButton();
+        ClearButton clearButton = new ClearButton("Clear");
 
         btnPanel.add(hashButton.getButton());
         btnPanel.add(importButton.getButton());
