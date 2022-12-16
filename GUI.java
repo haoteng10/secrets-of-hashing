@@ -177,5 +177,29 @@ public class GUI {
         // Making sure the clear function works
         clear();
         if (getSelectedFile() != null) StdOut.println("Error in clearing the inputs");
+
+        /*
+        Feature: TextArea Input Hashing (GUI)
+
+            i.Test for Feature 2
+            ii.Input: I input the string into the input text area
+
+            iii.Expected Outcome: The output text area correctly outputs the hash after
+            I clicked the "hash" button.
+
+            iv.Result: passed (manually tested)
+         */
+
+        /*
+        Feature: File Integrity Check (GUI)
+
+            i.Test for Feature 3
+            ii.Input: I imported a test file via the "file" button.
+
+            iii.Expected Outcome: The output text area correctly outputs the hash after
+            I clicked the "hash" button.
+
+            iv.Result: passed (manually tested)
+         */
     }
 }

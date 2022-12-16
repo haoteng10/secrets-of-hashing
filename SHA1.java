@@ -170,7 +170,7 @@ public class SHA1 {
         int total = 0;
         int correct = 0;
 
-        // Testing
+        // Tests for feature 1
         while (StdIn.hasNextLine()) {
             String input = StdIn.readLine();
             String expected = StdIn.readLine();
