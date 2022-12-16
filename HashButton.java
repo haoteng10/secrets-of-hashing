@@ -18,7 +18,7 @@ public class HashButton implements ActionListener {
     private JTextArea inputArea; // TextArea that has the user's input
     private JTextArea outputArea; // TextArea that displays the result
 
-    // Initialize the HashButton with provided name, input textArea, and output textArea
+    // Initializes the HashButton with provided name, input textArea, and output textArea
     public HashButton(String name, JTextArea inputArea, JTextArea outputArea) {
         this.inputArea = inputArea;
         this.outputArea = outputArea;

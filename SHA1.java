@@ -19,13 +19,13 @@ public class SHA1 {
             0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0
     };
 
-    // Construct a SHA1 object with string data type
+    // Constructs a SHA1 object with string data type
     public SHA1(String data) {
         byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
         compute(bytes);
     }
 
-    // Construct a SHA1 object with an imported file
+    // Constructs a SHA1 object with an imported file
     public SHA1(File file) throws IOException {
         byte[] bytes = Files.readAllBytes(file.toPath());
         compute(bytes);
@@ -45,7 +45,7 @@ public class SHA1 {
                              Integer.toBinaryString(val)).replace(" ", "0");
     }
 
-    // Compute the hash with the algorithm
+    // Computes the hash with the algorithm
     // (input: a byte array; no return value--manipulates the hash variables)
     // Referenced SHA1 Wikipedia
     // https://en.wikipedia.org/wiki/SHA-1
@@ -148,7 +148,7 @@ public class SHA1 {
         }
     }
 
-    // Convert the binaryString into padded hexadecimal
+    // Converts the binaryString into padded hexadecimal
     // (input: which hash variable; output: a padded hexadecimal string)
     private String getHex(int hashNum) {
         String hexString = Integer.toHexString(hashVars[hashNum]);

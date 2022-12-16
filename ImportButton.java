@@ -14,6 +14,7 @@ public class ImportButton implements ActionListener {
 
     private JButton button; // Java Swing Button
 
+    // Initializes the import button with the provided name
     public ImportButton(String name) {
         button = new JButton(name);
         button.addActionListener(this);
@@ -39,6 +40,7 @@ public class ImportButton implements ActionListener {
         return button;
     }
 
+    // Main method for testing
     public static void main(String[] args) {
         ImportButton importButton = new ImportButton("Test");
 
