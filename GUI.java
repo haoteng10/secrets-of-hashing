@@ -1,7 +1,5 @@
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -12,12 +10,9 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.File;
-import java.io.IOException;
 
 /*
 GUI Class
@@ -26,15 +21,15 @@ This class hosts the Java Swing code which creates a graphical user interface fo
 program.
  */
 
-public class GUI implements ActionListener {
+public class GUI {
 
-    private JTextArea inputArea; // Java Swing's Text Area for Input
-    private JTextArea outputArea; // Java Swing's Text Area for Output
+    private static JLabel statusLabel; // A Java Swing Label to indicate current status
+    private static File selectedFile; // Storing the imported file
+    private static JTextArea inputArea; // Java Swing's Text Area for Input
+    private static JTextArea outputArea; // Java Swing's Text Area for Output
 
-    private File selectedFile; // Storing the imported file
-
-    private JLabel status; // A Java Swing Label to indicate current status
-
+    private static final String placeholderMessage = "Write your message here"; // Default Message
+    
     // Renders the graphical user interface
     public GUI() {
 
@@ -42,7 +37,7 @@ public class GUI implements ActionListener {
         JPanel headingPanel = new JPanel();
 
         // Title
-        JLabel title = new JLabel("Secrets of Hashing", SwingConstants.CENTER);
+        JLabel title = new JLabel("SHA1 Hashing", SwingConstants.CENTER);
 
         headingPanel.add(title);
 
@@ -51,21 +46,21 @@ public class GUI implements ActionListener {
         textPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 30, 20));
 
         // Input Text Area
-        // Adapted from https://docs.oracle.com/javase/tutorial/uiswing/components/textarea.html
-        String placeholderMessage = "Write your message here";
+        // Adapted from Oracle Documentation
+        // https://docs.oracle.com/javase/tutorial/uiswing/components/textarea.html
         inputArea = new JTextArea(placeholderMessage);
         inputArea.setLineWrap(true);
         inputArea.setWrapStyleWord(true);
         inputArea.addFocusListener(new FocusListener() {
 
             public void focusGained(FocusEvent e) {
-                inputArea.setText("");
+                if (inputArea.getText().equals(placeholderMessage))
+                    inputArea.setText("");
             }
 
             public void focusLost(FocusEvent e) {
-                if (inputArea.getText().isEmpty()) {
+                if (inputArea.getText().isEmpty())
                     inputArea.setText(placeholderMessage);
-                }
             }
         });
 
@@ -75,7 +70,8 @@ public class GUI implements ActionListener {
         inputAreaScrollPane.setPreferredSize(new Dimension(250, 250));
 
         // Output Text Area
-        // Adapted from https://docs.oracle.com/javase/tutorial/uiswing/components/textarea.html
+        // Adapted from Oracle Documentation
+        // https://docs.oracle.com/javase/tutorial/uiswing/components/textarea.html
         outputArea = new JTextArea("Result will be shown here");
         outputArea.setLineWrap(true);
         outputArea.setEditable(false);
@@ -92,42 +88,23 @@ public class GUI implements ActionListener {
         // ===== Result Panel =====
         JPanel resultPanel = new JPanel();
 
-        status = new JLabel();
+        statusLabel = new JLabel();
 
-        resultPanel.add(status);
+        resultPanel.add(statusLabel);
 
         // ===== Button Panel =====
         JPanel btnPanel = new JPanel();
 
         // Hash Button
-        JButton button = new JButton("Hash");
-        button.addActionListener(this);
-
-        // Import File Button
-        JButton importButton = new JButton("File");
-        importButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = new JFileChooser();
-                int statusCode = fc.showOpenDialog(null);
-                if (statusCode == JFileChooser.APPROVE_OPTION) {
-                    selectedFile = fc.getSelectedFile();
-                    setStatus("Selected: " + selectedFile.getName());
-                }
-            }
-        });
-
+        HashButton hashButton = new HashButton(inputArea, outputArea);
+        // Import Button
+        ImportButton importButton = new ImportButton();
         // Unselect File Button
-        JButton unSelectButton = new JButton("Unselect");
-        unSelectButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                selectedFile = null;
-                setStatus("");
-            }
-        });
+        ClearButton clearButton = new ClearButton();
 
-        btnPanel.add(button);
-        btnPanel.add(importButton);
-        btnPanel.add(unSelectButton);
+        btnPanel.add(hashButton.getButton());
+        btnPanel.add(importButton.getButton());
+        btnPanel.add(clearButton.getButton());
 
         // ===== Frame =====
         JFrame frame = new JFrame();
@@ -137,44 +114,46 @@ public class GUI implements ActionListener {
         frame.add(resultPanel);
         frame.add(btnPanel);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setTitle("GUI");
+        frame.setTitle("Secrets of Hashing");
         frame.pack();
         frame.setVisible(true);
 
     }
 
     // Changes the text of the status label
-    // (input: current status string; output: none--manipulates the label )
-    private void setStatus(String status) {
-        this.status.setText(status);
+    // (input: current status string; output: none--manipulates the label)
+    public static void setStatus(String status) {
+        statusLabel.setText(status);
     }
 
-    // Method called after clicking the "hash" button
-    // (input: the buttonClick event; output: none--directly manipulates the GUI )
-    public void actionPerformed(ActionEvent e) {
-        String inputText = inputArea.getText();
+    // A getter for selectedFile
+    // (input: none; output: the reference to the file)
+    public static File getSelectedFile() {
+        return selectedFile;
+    }
 
-        SHA1 hash;
+    // A setter for selectedFile
+    // (input: File; output none)
+    public static void setSelectedFile(File file) {
+        selectedFile = file;
+    }
 
-        if (selectedFile == null) {
-            hash = new SHA1(inputText);
-            outputArea.setText(hash.hexResult());
-        }
-        else {
-            try {
-                hash = new SHA1(selectedFile);
-                outputArea.setText(hash.hexResult());
-            }
-            catch (IOException ex) {
-                setStatus("Invalid file.");
-                // throw new RuntimeException(ex);
-            }
-        }
+    // Resets the file
+    public static void clear() {
+        // Clear selectedFile
+        setSelectedFile(null);
+        setStatus("");
 
+        // Clear textAreas
+        inputArea.setText(placeholderMessage);
+        outputArea.setText("");
     }
 
     // Main method to run
     public static void main(String[] args) {
+        // Testing prior to running
+        // Check status method
+
         new GUI();
     }
 }

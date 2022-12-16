@@ -47,6 +47,8 @@ public class SHA1 {
 
     // Compute the hash with the algorithm
     // (input: a byte array; no return value--manipulates the hash variables)
+    // Referenced SHA1 Wikipedia
+    // https://en.wikipedia.org/wiki/SHA-1
     private void compute(byte[] bytes) {
         // Convert the bytes into a binaryString
         StringBuilder binary = new StringBuilder();
@@ -65,19 +67,22 @@ public class SHA1 {
         }
         binary.append(binaryInitalLength);
 
+        int CHUNK_SIZE = 512;
+        int NUM_WORDS = 80;
+
         // Step 1: Loop through every 512-bits as a chunk
-        for (int startingPoint = 0; startingPoint < binary.length(); startingPoint += 512) {
+        for (int startingPoint = 0; startingPoint < binary.length(); startingPoint += CHUNK_SIZE) {
 
-            String chunk = binary.substring(startingPoint, startingPoint + 512);
+            String chunk = binary.substring(startingPoint, startingPoint + CHUNK_SIZE);
 
-            String[] words = new String[80];
+            String[] words = new String[NUM_WORDS];
             // Step 2: Break the 512-bit chunk into 16 32-bit words
             for (int i = 0; i < 16; i++) {
                 words[i] = chunk.substring(i * 32, i * 32 + 32);
             }
 
             // Step 3: Extend the 16 32-bit words into 80 32-bit words using bitwise operators
-            for (int i = 16; i < 80; i++) {
+            for (int i = 16; i < NUM_WORDS; i++) {
 
                 long wordA = Long.parseLong(words[i - 3], 2);
                 long wordB = Long.parseLong(words[i - 8], 2);
@@ -97,8 +102,9 @@ public class SHA1 {
             int d = hashVars[3];
             int e = hashVars[4];
 
-            // Step 5: Run the different functions in 4 stages (0-19, 20-39, 40-59, 60-79) and save it
-            for (int i = 0; i < 80; i++) {
+            // Step 5: Run the different functions in 4 stages (0-19, 20-39, 40-59, 60-79)
+            // and save it
+            for (int i = 0; i < NUM_WORDS; i++) {
                 int functionOutput;
                 int constant;
 
