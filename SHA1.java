@@ -3,42 +3,60 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+/*
+SHA1 Class
+
+This class hosts the Java code for the SHA1 hashing algorithm. It will take a string
+input or a file input and automatically hash the input. Users can get back the hash
+result by calling the public method hexResult().
+
+ */
+
 public class SHA1 {
 
+    // Initial hashing constants provided for SHA1 hash algorithm
     private int[] hashVars = {
             0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0
     };
 
+    // Construct a SHA1 object with string data type
     public SHA1(String data) {
         byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
         compute(bytes);
     }
 
+    // Construct a SHA1 object with an imported file
     public SHA1(File file) throws IOException {
         byte[] bytes = Files.readAllBytes(file.toPath());
         compute(bytes);
     }
 
+    // Get a padded 8-bit binary string
+    // (input: byte value; output: a padded 8-bit binary string)
+    private static String getPaddedBinary(byte val) {
+        return String.format("%8s",
+                             Integer.toBinaryString(Byte.toUnsignedInt(val))).replace(" ", "0");
+    }
+
     // Get a padded n-bit binary string
+    // Overloading (input: int value and number of bits; output: a padded n-bit binary string)
     private static String getPaddedBinary(int val, int num) {
         return String.format("%" + num + "s",
                              Integer.toBinaryString(val)).replace(" ", "0");
     }
 
-    // Get a padded 8-bit binary string
-    private static String getPaddedByte(int val) {
-        return getPaddedBinary(val, 8);
-    }
-
+    // Compute the hash with the algorithm
+    // (input: a byte array; no return value--manipulates the hash variables)
     private void compute(byte[] bytes) {
-        // Convert ASCII number into binary
+        // Convert the bytes into a binaryString
         StringBuilder binary = new StringBuilder();
         for (int i = 0; i < bytes.length; i++) {
-            binary.append(getPaddedByte(bytes[i]));
+            binary.append(getPaddedBinary(bytes[i]));
         }
 
         // Step 0: pad the message to have a length of a multiple of 512-bits
         int initialLength = binary.length();
+
         String binaryInitalLength = getPaddedBinary(initialLength, 64);
         int noPaddedZero = 512 - (initialLength % 512) - 64; // Leave 64 for length
         binary.append("1");
@@ -125,21 +143,22 @@ public class SHA1 {
     }
 
     // Convert the binaryString into padded hexadecimal
-    public String getHex(int hashNum) {
+    // (input: which hash variable; output: a padded hexadecimal string)
+    private String getHex(int hashNum) {
         String hexString = Integer.toHexString(hashVars[hashNum]);
-        if (hexString.length() == 8) return hexString;
-
-        while (hexString.length() != 8) {
+        while (hexString.length() < 8) {
             hexString = "0" + hexString;
         }
         return hexString;
     }
 
-    // Returns the result in hexadecimal string
+    // Combines the five hash variables into a 40-character hexadecimal string
+    // (input: none; output: 40-character hexadecimal string)
     public String hexResult() {
         return getHex(0) + getHex(1) + getHex(2) + getHex(3) + getHex(4);
     }
 
+    // Main Testing Method
     public static void main(String[] args) {
 
         int total = 0;

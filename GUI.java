@@ -19,16 +19,23 @@ import java.awt.event.FocusListener;
 import java.io.File;
 import java.io.IOException;
 
+/*
+GUI Class
+
+This class hosts the Java Swing code which creates a graphical user interface for the
+program.
+ */
+
 public class GUI implements ActionListener {
 
-    private String inputText;
-    private JTextArea inputArea;
-    private JTextArea outputArea;
+    private JTextArea inputArea; // Java Swing's Text Area for Input
+    private JTextArea outputArea; // Java Swing's Text Area for Output
 
-    private File selectedFile;
+    private File selectedFile; // Storing the imported file
 
-    private JLabel status;
+    private JLabel status; // A Java Swing Label to indicate current status
 
+    // Renders the graphical user interface
     public GUI() {
 
         // ===== Heading Panel =====
@@ -68,6 +75,7 @@ public class GUI implements ActionListener {
         inputAreaScrollPane.setPreferredSize(new Dimension(250, 250));
 
         // Output Text Area
+        // Adapted from https://docs.oracle.com/javase/tutorial/uiswing/components/textarea.html
         outputArea = new JTextArea("Result will be shown here");
         outputArea.setLineWrap(true);
         outputArea.setEditable(false);
@@ -135,16 +143,16 @@ public class GUI implements ActionListener {
 
     }
 
+    // Changes the text of the status label
+    // (input: current status string; output: none--manipulates the label )
     private void setStatus(String status) {
         this.status.setText(status);
     }
 
-    public static void main(String[] args) {
-        new GUI();
-    }
-
+    // Method called after clicking the "hash" button
+    // (input: the buttonClick event; output: none--directly manipulates the GUI )
     public void actionPerformed(ActionEvent e) {
-        inputText = inputArea.getText();
+        String inputText = inputArea.getText();
 
         SHA1 hash;
 
@@ -163,5 +171,10 @@ public class GUI implements ActionListener {
             }
         }
 
+    }
+
+    // Main method to run
+    public static void main(String[] args) {
+        new GUI();
     }
 }
