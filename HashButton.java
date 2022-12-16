@@ -4,6 +4,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
+/*
+HashButton Class
+
+This class creates a button that starts the process of hashing and
+changing the contents of Swing elements accordingly.
+ */
+
 public class HashButton implements ActionListener {
 
     private JButton button; // Java Swing Button

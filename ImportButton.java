@@ -4,9 +4,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+/*
+ImportButton Class
+
+This class creates a button that allows user to import a local file.
+ */
+
 public class ImportButton implements ActionListener {
 
-    private JButton button;
+    private JButton button; // Java Swing Button
 
     public ImportButton(String name) {
         button = new JButton(name);

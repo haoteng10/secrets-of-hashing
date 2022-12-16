@@ -2,6 +2,12 @@ import javax.swing.JButton;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/*
+ClearButton Class
+
+This class creates a button that clears the user interface contents.
+ */
+
 public class ClearButton implements ActionListener {
 
     private JButton button; // Java Swing Button

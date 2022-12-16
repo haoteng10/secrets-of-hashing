@@ -17,8 +17,7 @@ import java.io.File;
 /*
 GUI Class
 
-This class hosts the Java Swing code which creates a graphical user interface for the
-program.
+This class creates a graphical user interface for the program.
  */
 
 public class GUI {
